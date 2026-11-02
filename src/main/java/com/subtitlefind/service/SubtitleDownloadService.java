@@ -8,6 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -22,10 +24,16 @@ public class SubtitleDownloadService {
 
     private static final Logger logger = LoggerFactory.getLogger(SubtitleDownloadService.class);
 
+    /** 代理主机 */
+    private static final String PROXY_HOST = "127.0.0.1";
+    /** 代理端口 */
+    private static final int PROXY_PORT = 7890;
+
     private final OkHttpClient httpClient;
 
     public SubtitleDownloadService() {
         this.httpClient = new OkHttpClient.Builder()
+                .proxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress(PROXY_HOST, PROXY_PORT)))
                 .connectTimeout(30, TimeUnit.SECONDS)
                 .readTimeout(120, TimeUnit.SECONDS)
                 .writeTimeout(30, TimeUnit.SECONDS)
@@ -56,6 +64,7 @@ public class SubtitleDownloadService {
             logger.error("字幕下载链接为空: {}", subtitleInfo.getTitle());
             return false;
         }
+
 
         try {
             logger.info("开始下载字幕: {} -> {}", subtitleInfo.getTitle(), videoFileName);
