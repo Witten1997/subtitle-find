@@ -109,9 +109,9 @@ public class SubtitleFinderService {
                     boolean success = processVideoFile(videoFile);
                     if (success) {
                         successCount++;
-                        log("INFO", "✓ 成功为视频文件下载字幕: " + videoFile.getFileNameWithoutExtension());
+                        log("INFO", "成功为视频文件下载字幕: " + videoFile.getFileNameWithoutExtension());
                     } else {
-                        log("WARN", "✗ 未能为视频文件找到字幕: " + videoFile.getFileNameWithoutExtension());
+                        log("WARN", "未能为视频文件找到字幕: " + videoFile.getFileNameWithoutExtension());
                     }
                 } catch (Exception e) {
                     log("ERROR", "处理视频文件时发生错误: " + videoFile.getFileName() + " - " + e.getMessage());
@@ -120,7 +120,7 @@ public class SubtitleFinderService {
                 // 添加延迟以避免过于频繁的请求
                 if (processedCount < videoFiles.size()) {
                     try {
-                        Thread.sleep(2000); // 延迟2秒
+                        Thread.sleep(500); // 延迟2秒
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                         break;
@@ -170,7 +170,7 @@ public class SubtitleFinderService {
                 return false;
             }
 
-            log("INFO", "找到 " + subtitles.size() + " 个候选字幕");
+            //log("INFO", "找到 " + subtitles.size() + " 个候选字幕");
 
             // 2. 获取第一个字幕的下载链接并下载
             for (SubtitleInfo subtitle : subtitles) {

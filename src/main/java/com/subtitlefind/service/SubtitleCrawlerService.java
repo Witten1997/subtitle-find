@@ -11,6 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -30,12 +32,18 @@ public class SubtitleCrawlerService {
     private static final String BASE_URL = "https://subtitlecat.com";
     private static final String SEARCH_URL = BASE_URL + "/index.php";
 
+    /** 代理主机 */
+    private static final String PROXY_HOST = "127.0.0.1";
+    /** 代理端口 */
+    private static final int PROXY_PORT = 7890;
+
     private final OkHttpClient httpClient;
     private final Pattern downloadPattern = Pattern.compile("(\\d+)");
     private final Pattern commentPattern = Pattern.compile("(\\d+)");
 
     public SubtitleCrawlerService() {
         this.httpClient = new OkHttpClient.Builder()
+            .proxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress(PROXY_HOST, PROXY_PORT)))
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(60, TimeUnit.SECONDS)
             .writeTimeout(30, TimeUnit.SECONDS)
@@ -53,7 +61,7 @@ public class SubtitleCrawlerService {
         List<SubtitleInfo> subtitles = new ArrayList<>();
 
         try {
-            logger.info("开始搜索字幕，关键词: {}", keyword);
+            //logger.info("开始搜索字幕，关键词: {}", keyword);
             String encodedKeyword = URLEncoder.encode(keyword, StandardCharsets.UTF_8);
             String searchUrl = SEARCH_URL + "?search=" + encodedKeyword;
 

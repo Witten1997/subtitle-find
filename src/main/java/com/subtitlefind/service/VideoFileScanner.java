@@ -26,6 +26,9 @@ public class VideoFileScanner {
         ".mp4", ".mkv", ".avi", ".mov", ".wmv", ".flv", ".webm", ".m4v", ".3gp", ".ts"
     );
 
+    // 视频文件最小大小：100MB（小于该大小的文件将被忽略）
+    private static final long MIN_FILE_SIZE = 100L * 1024 * 1024;
+
     // 视频质量后缀模式（需要在搜索时去除的后缀）
     private static final Pattern QUALITY_SUFFIX_PATTERN = Pattern.compile(
         "(-(?:4k|4K|BD|bd|1080p|720p|2160p|HDR|UHD|REMUX|BluRay|WEB-DL|WEBRip|BDRip))$",
@@ -58,6 +61,7 @@ public class VideoFileScanner {
             pathStream
                 .filter(Files::isRegularFile)
                 .filter(this::isVideoFile)
+                .filter(this::isLargeEnough)
                 .forEach(path -> {
                     VideoFileInfo videoInfo = createVideoFileInfo(path);
                     if (videoInfo != null) {
@@ -82,6 +86,26 @@ public class VideoFileScanner {
     private boolean isVideoFile(Path path) {
         String fileName = path.getFileName().toString().toLowerCase();
         return VIDEO_EXTENSIONS.stream().anyMatch(fileName::endsWith);
+    }
+
+    /**
+     * 判断文件大小是否达到阈值（大于等于 100MB）
+     *
+     * @param path 文件路径
+     * @return 是否达到最小大小要求
+     */
+    private boolean isLargeEnough(Path path) {
+        try {
+            long size = Files.size(path);
+            if (size < MIN_FILE_SIZE) {
+                logger.debug("文件小于 {}MB，跳过: {} ({} 字节)", MIN_FILE_SIZE / 1024 / 1024, path.getFileName(), size);
+                return false;
+            }
+            return true;
+        } catch (IOException e) {
+            logger.warn("获取文件大小失败，跳过: {}", path);
+            return false;
+        }
     }
 
     /**
